@@ -89,6 +89,7 @@ private slots:
 
 private:
     void initActionsConnections();
+    char makeCRC(const QByteArray &data);
 
 private:
     void showStatusMessage(const QString &message);

@@ -140,6 +140,15 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 }
 
+char MainWindow::makeCRC(const QByteArray &data)
+{
+    char checkSum = 0;
+    for (auto cData : data) {
+        checkSum ^= cData;
+    }
+    return checkSum;
+}
+
 void MainWindow::showStatusMessage(const QString &message)
 {
     m_status->setText(message);
@@ -149,7 +158,7 @@ void MainWindow::on_btn_send_clicked() {
     int address = 0x44332211;
 
     QString text = m_ui->input_text->text();
-    QByteArray data = QByteArray::fromHex(text.toLatin1());
+    QByteArray data = QByteArray::fromHex(text.toLatin1()); // RawData
 
     CanFrame frame;
     frame.GenerateWriteData(address, data);

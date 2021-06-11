@@ -12,6 +12,9 @@ public:
 
     void GenerateWriteData(const uint32_t &address, QByteArray& data);
     QByteArray DecodeData(const QByteArray& data);
+
+private:
+    char makeCRC(const QByteArray &data);
 };
 
 #endif // CANFRAME_H

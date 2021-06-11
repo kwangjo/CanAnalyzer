@@ -11,6 +11,12 @@ enum CanPacketType : char {
     LOG
 };
 
+enum CanChannel : char {
+    CH1 = 0,
+    CH2,
+    MAX
+};
+
 enum CanPacketDirection : char {
     CAN_WRITE = 0,  // PC -> MCU
     CAN_READ,       // MCU -> PC
