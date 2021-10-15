@@ -4,13 +4,16 @@
 #include <QCanBusDevice>
 
 class SerialBusCanBackend : public QCanBusDevice {
+    Q_OBJECT
 public:
-    SerialBusCanBackend();
+//    explicit SerialBusCanBackend();
+    explicit SerialBusCanBackend(const QString &interface, QObject *parent = nullptr);
     ~SerialBusCanBackend() = default;
 
     bool writeFrame(const QCanBusFrame& frame) override;
     QString interpretErrorFrame(const QCanBusFrame& errorFrame) override;
 
+//    static QList<QCanBusDeviceInfo> interfaces();
 protected:
     bool open() override;
     void close() override;
@@ -25,7 +28,6 @@ private slots:
 private:
     int timerID;
     quint8 serialPortNum;
-
 };
 
 #endif  // SERIALBUSCANBACKEND_H

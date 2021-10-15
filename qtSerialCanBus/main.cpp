@@ -1,6 +1,11 @@
+//#include "CannelloniCanBackend.h"
 #include "SerialBusCanBackend.h"
 
-#include <QCanBusFactory>
+
+//#include <QCanBusFactory>
+#include <QtSerialBus/qcanbus.h>
+#include <QtSerialBus/qcanbusdevice.h>
+#include <QtSerialBus/qcanbusfactory.h>
 #include <QObject>
 #include <QStringList>
 #include <limits>
@@ -8,7 +13,7 @@
 #include <QtCore/qloggingcategory.h>
 #include <QDebug>
 
-#include <iostream>
+QT_BEGIN_NAMESPACE
 
 Q_LOGGING_CATEGORY(QT_CANBUS_PLUGINS_SERIALCAN, "qt.canbus.plugins.serialcan")
 
@@ -29,7 +34,6 @@ public:
     QCanBusDevice* createDevice(const QString& interfaceName,
                                 QString* errorMessage) const override {
         qDebug() << "Create Device";
-        std::cout << "interfaceName " << interfaceName.toStdString().c_str() << std::endl;
         /*
         auto tokens = interfaceName.split(QChar(','));
         if (tokens.size() != 3) {
@@ -63,4 +67,7 @@ public:
     }
 };
 
-#include "QtSerialCanBusPlugin.moc"
+QT_END_NAMESPACE
+
+
+#include "main.moc"

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
-project(qtSerialCanBusPlugin CXX)
+#project(qtSerialCanBusPlugin CXX)
+project(qtserialcanbus CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -15,8 +16,8 @@ include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5SerialBus_INCLUDE_DIRS}
 
 add_library(${PROJECT_NAME} SHARED
   QtSerialCanBusPlugin.cpp
-  CannelloniCanBackend.cpp
   SerialBusCanBackend.cpp
+#  CannelloniCanBackend.cpp
 #  cannelloni/parser.cpp
   )
 
