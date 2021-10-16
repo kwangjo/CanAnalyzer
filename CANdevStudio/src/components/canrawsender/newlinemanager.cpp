@@ -38,7 +38,7 @@ NewLineManager::NewLineManager(CanRawSender* q, bool _simulationState, NLMFactor
 
     // Data
     _data.reset(mFactory.createLineEdit());
-    qRegExp.setPattern("[0-9A-Fa-f]{16}");
+    qRegExp.setPattern("[0-9A-Fa-f]{128}");
     _vDataHex = new QRegExpValidator(qRegExp, this);
     _data->init("Data in hex", _vDataHex);
     _data->textChangedCbk(std::bind(&NewLineManager::FrameDataChanged, this));

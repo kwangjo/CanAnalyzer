@@ -17,7 +17,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 option(WITH_COVERAGE "Build with coverage" OFF)
-option(WITH_TESTS "Build with test" ON)
+option(WITH_TESTS "Build with test" OFF)
 option(WITH_TOOLS "Build tools directory" OFF)
 option(DEV_BUILD "Development build will include GIT hash and branch to versioning" ON)
 option(STANDALONE "Builds self containing package including Qt libs" OFF)
