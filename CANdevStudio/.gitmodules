@@ -1,0 +1,27 @@
+[submodule "3rdParty/fakeit"]
+	path = 3rdParty/fakeit
+	url = https://github.com/eranpeer/FakeIt.git
+[submodule "3rdParty/spdlog"]
+	path = 3rdParty/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "3rdParty/nodeeditor"]
+	path = 3rdParty/nodeeditor
+	url = https://github.com/rkollataj/nodeeditor
+[submodule "3rdParty/rapidjson"]
+	path = 3rdParty/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "3rdParty/qtCannelloniCanBus"]
+	path = 3rdParty/qtCannelloniCanBus
+	url = https://github.com/tuvok/qtCannelloniCanBus.git
+[submodule "3rdParty/readerwriterqueue"]
+	path = 3rdParty/readerwriterqueue
+	url = https://github.com/cameron314/readerwriterqueue
+[submodule "3rdParty/cxxopts"]
+	path = 3rdParty/cxxopts
+	url = https://github.com/jarro2783/cxxopts.git
+[submodule "3rdParty/CANdb"]
+	path = 3rdParty/CANdb
+	url = https://github.com/GENIVI/CANdb.git
+[submodule "3rdParty/catch"]
+	path = 3rdParty/catch
+	url = https://github.com/catchorg/Catch2

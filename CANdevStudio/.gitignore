@@ -1,0 +1,7 @@
+*.swp
+build
+*.o
+*.user
+.vimrc
+.ycm_extra_conf.py
+.*.un~

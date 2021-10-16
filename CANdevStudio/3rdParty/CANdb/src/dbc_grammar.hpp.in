@@ -1,0 +1,11 @@
+#ifndef DBC_GRAMMAR_HPP
+#define DBC_GRAMMAR_HPP
+
+#include <cstring>
+
+std::string dbc_grammar = R"(
+@DBC_GRAMMAR@
+)";
+
+#endif /* end of include guard: DBC_GRAMMAR_HPP */
+
