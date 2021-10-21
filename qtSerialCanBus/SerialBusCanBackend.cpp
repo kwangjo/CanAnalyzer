@@ -11,6 +11,8 @@ const unsigned long OUTGOING_QUEUE_TIMEOUT_MSEC = 50;
 //    qDebug() << __FUNCTION__;
 //}
 
+// Singleton : Singleton unique_ptr. https://rextester.com/UOFG36197
+
 SerialBusCanBackend::SerialBusCanBackend(const QString &interface, QObject *parent) : QCanBusDevice(parent) {
     qDebug() << Q_FUNC_INFO;
 }
@@ -67,6 +69,10 @@ void SerialBusCanBackend::timerEvent(QTimerEvent *event) {
     if (frame.isValid()) {
         std::cout << "frame id: " << frame.frameId() << std::endl;
         QVector<QCanBusFrame> newFrames;
+        frame.frameId();
+        frame.frameType();
+        frame.payload();
+
         newFrames.push_back(frame);
         enqueueReceivedFrames(newFrames);
     }

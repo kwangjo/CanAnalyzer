@@ -14,8 +14,11 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
+#include <QTimerEvent>
 
 #include <QDebug>
+
+#include "SerialCan.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,7 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_status(new QLabel),
     m_settings(new SettingsDialog),
     m_serial(new QSerialPort(this)),
-    mStatus(0)
+    mStatus(0),
+    timerID(0)
 {
     m_ui->setupUi(this);
     QWidget::setWindowTitle("CanAnalyzer v0.1  ");
@@ -37,6 +41,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(m_serial, &QSerialPort::errorOccurred, this, &MainWindow::handleError);
     connect(m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
+
+     SerialCan::getInstance();
+//     SerialCan::getInstance();
+//     SerialCan::destroyInstance();
 }
 
 MainWindow::~MainWindow()
@@ -90,7 +98,8 @@ void MainWindow::about()
 
 void MainWindow::writeData(const QByteArray &data)
 {
-    m_serial->write(data);
+    SerialCan::getInstance().writePacket(data);
+//    m_serial->write(data);
 }
 
 void MainWindow::readData()
@@ -149,6 +158,14 @@ char MainWindow::makeCRC(const QByteArray &data)
     return checkSum;
 }
 
+void MainWindow::timerEvent(QTimerEvent *) {
+//    qDebug() << __FUNCTION__ << "write total" << mDataArray.size();
+
+    for (const auto& data : mDataArray) {
+        SerialCan::getInstance().writePacket(data);
+    }
+}
+
 void MainWindow::showStatusMessage(const QString &message)
 {
     m_status->setText(message);
@@ -162,6 +179,21 @@ void MainWindow::on_btn_send_clicked() {
 
     CanFrame frame;
     frame.GenerateWriteData(address, data);
-    auto length = m_serial->write(data);
+    SerialCan::getInstance().writePacket(data);
+
+
+    if (timerID == 0) {
+        mDataArray.emplace_back(data);
+        mDataArray.emplace_back(data);
+        mDataArray.emplace_back(data);
+        mDataArray.emplace_back(data);
+        mDataArray.emplace_back(data);
+        timerID = startTimer(50);
+    } else {
+        killTimer(timerID);
+        timerID = 0;
+        mDataArray.clear();
+        SerialCan::getInstance().clearBuffer();
+    }
     m_ui->text_recv->append(QString(data.toHex()).toUpper());
 }

@@ -1,8 +1,8 @@
-QT       += core gui serialport
+QT       += core gui serialport widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++14
+CONFIG += c++17
 
 INCLUDEPATH += include
 
@@ -10,9 +10,11 @@ HEADERS += \
     include/commoncan.h \
     include/mainwindow.h \
     include/settingsdialog.h \
-    include/canframe.cpp
+    include/canframe.cpp \
+    include/SerialCan.h
 
 SOURCES += \
+    src/SerialCan.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/settingsdialog.cpp \

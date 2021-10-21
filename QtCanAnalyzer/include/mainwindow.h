@@ -54,6 +54,7 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
+#include "SerialCan.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -71,7 +72,6 @@ class SettingsDialog;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -90,7 +90,8 @@ private slots:
 private:
     void initActionsConnections();
     char makeCRC(const QByteArray &data);
-
+protected:
+    void timerEvent(QTimerEvent*) override;
 private:
     void showStatusMessage(const QString &message);
 
@@ -101,6 +102,8 @@ private:
     QSerialPort *m_serial = nullptr;
     QByteArray mRecvData;
     int mStatus = 0;
+    std::vector<QByteArray> mDataArray;
+    int timerID;
 };
 
 #endif // MAINWINDOW_H
