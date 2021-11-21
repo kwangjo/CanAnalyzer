@@ -18,10 +18,10 @@ void CanFrame::GenerateWriteData(const uint32_t& address, QByteArray &data) {
 //    data.prepend(static_cast<uint8_t>(address >> 0x10 & 0xFF));
 //    data.prepend(static_cast<uint8_t>(address >> 0x18 & 0xFF));
 
-        data.push_front(static_cast<uint8_t>(address) & 0xFF);
-        data.push_front(static_cast<uint8_t>(address >> 0x8 & 0xFF));
-        data.push_front(static_cast<uint8_t>(address >> 0x10 & 0xFF));
-        data.push_front(static_cast<uint8_t>(address >> 0x18 & 0xFF));
+    data.push_front(static_cast<uint8_t>(address) & 0xFF);
+    data.push_front(static_cast<uint8_t>(address >> 0x8 & 0xFF));
+    data.push_front(static_cast<uint8_t>(address >> 0x10 & 0xFF));
+    data.push_front(static_cast<uint8_t>(address >> 0x18 & 0xFF));
 
     data.push_front(length >> 8);
     data.push_front(length & 0xFF);

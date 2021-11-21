@@ -19,6 +19,13 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <widget class="SendFrameBox" name="sendFrameBox">
+      <property name="title">
+       <string>Send CAN frame</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout"/>
     </item>
     <item>

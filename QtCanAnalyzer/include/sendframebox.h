@@ -1,10 +1,9 @@
 /****************************************************************************
 **
-** Copyright (C) 2012 Denis Shienkov <denis.shienkov@gmail.com>
-** Copyright (C) 2012 Laszlo Papp <lpapp@kde.org>
+** Copyright (C) 2017 Andre Hartmann <aha_1980@gmx.de>
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the QtSerialPort module of the Qt Toolkit.
+** This file is part of the examples of the QtSerialBus module.
 **
 ** $QT_BEGIN_LICENSE:BSD$
 ** Commercial License Usage
@@ -49,59 +48,65 @@
 **
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef SENDFRAMEBOX_H
+#define SENDFRAMEBOX_H
 
-#include <QMainWindow>
-#include <QSerialPort>
 #include <QCanBusFrame>
-#include "SerialCan.h"
+#include <QGroupBox>
+#include <QRegularExpression>
+#include <QValidator>
 
 QT_BEGIN_NAMESPACE
-
-class QLabel;
-
 namespace Ui {
-class MainWindow;
+class SendFrameBox;
 }
-
 QT_END_NAMESPACE
 
-class Console;
-class SettingsDialog;
-
-class MainWindow : public QMainWindow
+class HexIntegerValidator : public QValidator
 {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    explicit HexIntegerValidator(QObject *parent = nullptr);
 
-private slots:
-    void openSerialPort();
-    void closeSerialPort();
-    void about();
-    void writeData(const QByteArray &data);
+    QValidator::State validate(QString &input, int &) const;
 
-    void sendFrame(const QCanBusFrame &frame) const;
-    void on_btn_send_clicked();
+    void setMaximum(uint maximum);
 
 private:
-    void initActionsConnections();
-    char makeCRC(const QByteArray &data);
-protected:
-    void timerEvent(QTimerEvent*) override;
-private:
-    void showStatusMessage(const QString &message);
-
-    Ui::MainWindow *m_ui = nullptr;
-    QLabel *m_status = nullptr;
-    Console *m_console = nullptr;
-    SettingsDialog *m_settings = nullptr;
-    QByteArray mRecvData;
-    int mStatus = 0;
-    std::vector<QByteArray> mDataArray;
-    int timerID;
+    uint m_maximum = 0;
 };
 
-#endif // MAINWINDOW_H
+class HexStringValidator : public QValidator
+{
+    Q_OBJECT
+
+public:
+    explicit HexStringValidator(QObject *parent = nullptr);
+
+    QValidator::State validate(QString &input, int &pos) const;
+
+    void setMaxLength(int maxLength);
+
+private:
+    int m_maxLength = 0;
+};
+
+class SendFrameBox : public QGroupBox
+{
+    Q_OBJECT
+
+public:
+    explicit SendFrameBox(QWidget *parent = nullptr);
+    ~SendFrameBox();
+
+signals:
+    void sendFrame(const QCanBusFrame &frame);
+
+private:
+    Ui::SendFrameBox *m_ui = nullptr;
+
+    HexIntegerValidator *m_hexIntegerValidator = nullptr;
+    HexStringValidator *m_hexStringValidator = nullptr;
+};
+
+#endif // SENDFRAMEBOX_H

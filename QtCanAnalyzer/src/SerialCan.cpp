@@ -25,9 +25,9 @@ SerialCan &SerialCan::getInstance() {
 SerialCan::SerialCan() {
     qDebug() << "2. Create SerialCan";
     getPortsInfo();
-    QString portName = "COM35";
-    qint32  baudRate = 115200;
-    serialOpen(portName, baudRate);
+//    QString portName = "COM4";
+//    qint32  baudRate = 115200;
+//    serialOpen(portName, baudRate);
 }
 
 // https://forum.kde.org/viewtopic.php?f=204&t=164584

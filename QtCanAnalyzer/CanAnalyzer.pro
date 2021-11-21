@@ -1,4 +1,4 @@
-QT       += core gui serialport widgets
+QT       += core gui serialport widgets serialbus
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -11,20 +11,23 @@ HEADERS += \
     include/mainwindow.h \
     include/settingsdialog.h \
     include/canframe.cpp \
-    include/SerialCan.h
+    include/SerialCan.h \
+    include/sendframebox.h
 
 SOURCES += \
     src/SerialCan.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/settingsdialog.cpp \
-    src/canframe.cpp
+    src/canframe.cpp \
+    src/sendframebox.cpp
 
 RC_ICONS = images/CanIcon.ico
 
 FORMS += \
     graphic/mainwindow.ui \
-    graphic/settingsdialog.ui
+    graphic/settingsdialog.ui \
+    graphic/sendframebox.ui
 
 RESOURCES += \
     CanAnalyzer.qrc

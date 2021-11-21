@@ -25,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui(new Ui::MainWindow),
     m_status(new QLabel),
     m_settings(new SettingsDialog),
-    m_serial(new QSerialPort(this)),
     mStatus(0),
     timerID(0)
 {
@@ -38,17 +37,12 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->statusBar->addWidget(m_status);
 
     initActionsConnections();
-
-    connect(m_serial, &QSerialPort::errorOccurred, this, &MainWindow::handleError);
-    connect(m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
-
      SerialCan::getInstance();
-//     SerialCan::getInstance();
-//     SerialCan::destroyInstance();
 }
 
 MainWindow::~MainWindow()
 {
+    SerialCan::destroyInstance();
     delete m_settings;
     delete m_ui;
 }
@@ -56,13 +50,10 @@ MainWindow::~MainWindow()
 void MainWindow::openSerialPort()
 {
     const SettingsDialog::Settings p = m_settings->settings();
-    m_serial->setPortName(p.name);
-    m_serial->setBaudRate(p.baudRate);
-    m_serial->setDataBits(p.dataBits);
-    m_serial->setParity(p.parity);
-    m_serial->setStopBits(p.stopBits);
-    m_serial->setFlowControl(p.flowControl);
-    if (m_serial->open(QIODevice::ReadWrite)) {
+    QString name = p.name;
+    qint32 baudRate = p.baudRate;
+    if (SerialCan::getInstance().serialOpen(name, baudRate)){
+//    if (m_serial->open(QIODevice::ReadWrite)) {
         m_ui->actionConnect->setEnabled(false);
         m_ui->actionDisconnect->setEnabled(true);
         m_ui->actionConfigure->setEnabled(false);
@@ -70,16 +61,13 @@ void MainWindow::openSerialPort()
                           .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                           .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
     } else {
-        QMessageBox::critical(this, tr("Error"), m_serial->errorString());
-
         showStatusMessage(tr("Open error"));
     }
 }
 
 void MainWindow::closeSerialPort()
 {
-    if (m_serial->isOpen())
-        m_serial->close();
+    SerialCan::getInstance().serialClose();
     m_ui->actionConnect->setEnabled(true);
     m_ui->actionDisconnect->setEnabled(false);
     m_ui->actionConfigure->setEnabled(true);
@@ -99,44 +87,13 @@ void MainWindow::about()
 void MainWindow::writeData(const QByteArray &data)
 {
     SerialCan::getInstance().writePacket(data);
-//    m_serial->write(data);
+    //    m_serial->write(data);
 }
 
-void MainWindow::readData()
-{
-    const QByteArray data = m_serial->readAll();
-    mRecvData.append(data);
-// ToDO 패킷 연결
-    if (data.size() >= 3) {
-        if (data[0] == static_cast<char>(0xF0)) {
-            qDebug() << "startBit";
-            if (data[1] == CanPacketDirection::CAN_READ || data[1] == CanPacketDirection::CAN_WRITE) {
-                qDebug() << "cmd OK";
-                auto length = data[2];
-                qDebug() << "check Length :" << length + 3 << "  dataSize: " << data.size();
-                if (length + 3 == data.size()) {
-                    qDebug() << "data is OK";
-                } else {
-                    qDebug() << "copy Data";
-                }
-            } else {
-                // Not running
-            }
-        } else {
-            qDebug() << "size Error";
-        }
-    }
-    qDebug() << "readData" << data.size();
-    qDebug() << "HEX: " << data.toHex();
-
-}
-
-void MainWindow::handleError(QSerialPort::SerialPortError error)
-{
-    if (error == QSerialPort::ResourceError) {
-        QMessageBox::critical(this, tr("Critical Error"), m_serial->errorString());
-        closeSerialPort();
-    }
+void MainWindow::sendFrame(const QCanBusFrame &frame) const {
+    QString hexvalue = QString("%1").arg(frame.frameId(), 8, 16, QLatin1Char( '0' ));
+    QString data = "ID: " + hexvalue + " DATA: " + frame.payload().toHex();
+    m_ui->text_recv->append(data);
 }
 
 void MainWindow::initActionsConnections()
@@ -147,6 +104,8 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionConfigure, &QAction::triggered, m_settings, &SettingsDialog::show);
     connect(m_ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
+
+    connect(m_ui->sendFrameBox, &SendFrameBox::sendFrame, this, &MainWindow::sendFrame);
 }
 
 char MainWindow::makeCRC(const QByteArray &data)
