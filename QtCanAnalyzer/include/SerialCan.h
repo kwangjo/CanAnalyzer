@@ -8,6 +8,8 @@
 
 #include <QMutex>
 
+#include <QCanBusFrame>
+
 class SerialCan : public QSerialPort {
     Q_OBJECT
 public:
@@ -23,12 +25,19 @@ public:
     qint64 writePacket(const QByteArray &data);
 
     void clearBuffer();
+signals:
+    void recvCanFrame(QCanBusFrame frame);
+
+
 private:
     SerialCan();
 //    ~SerialCan() = default;
 
 
     bool calPacket(QByteArray &data);
+
+
+
 private slots:
     void readData();
 

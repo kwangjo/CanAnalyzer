@@ -10,6 +10,7 @@ constexpr char BIT_TYPE       = 1;
 constexpr char BIT_CMD        = 2;
 constexpr char BIT_LENGTH_LSB = 3;
 constexpr char BIT_LENGTH_MSB = 4;
+constexpr char BIT_ADDRESS_START = 5;
 
 enum CanPacketType : char {
     CAN = 0x00,

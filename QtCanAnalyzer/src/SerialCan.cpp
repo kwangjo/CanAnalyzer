@@ -1,16 +1,14 @@
 #include "SerialCan.h"
 #include "commoncan.h"
 
-//#include <QCanBus>
-//#include <QCanBusFrame>
-
+#include <QCanBusFrame>
+#include <QByteArray>
 #include <QSerialPortInfo>
-
 
 #include <QDebug>
 
 
-constexpr bool debug = false;
+constexpr bool debug = true;
 
 static std::unique_ptr<SerialCan> instance = nullptr;
 
@@ -48,6 +46,13 @@ bool SerialCan::calPacket(QByteArray &data) {
                         // 1.Data Check CRC
                         // 2.MICOM -> PC
                         // 3 QCanBusFrame frame = QCanBusFrame(id, frameData);
+                        quint32 id = data.mid(BIT_ADDRESS_START, 4).toHex().toUInt(nullptr, 16);
+                        QByteArray frameData = data.mid(BIT_ADDRESS_START + 4, dataLength - 4);
+                        QCanBusFrame frame = QCanBusFrame(id, frameData);
+
+//                        qDebug() << "Hex ID" << data.mid(BIT_ADDRESS_START, 4).toHex();
+                        qDebug () << "frame is" << frame.frameId() << " data" << frame.payload();
+                        emit recvCanFrame(frame);
                         data.remove(0, endPacket + 1);
                         return true;
                     }

@@ -84,6 +84,7 @@ private slots:
     void writeData(const QByteArray &data);
 
     void sendFrame(const QCanBusFrame &frame) const;
+    void recvFrame(const QCanBusFrame &frame);
     void on_btn_send_clicked();
 
 private:

@@ -36,8 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->actionConfigure->setEnabled(true);
     m_ui->statusBar->addWidget(m_status);
 
+    SerialCan::getInstance();
     initActionsConnections();
-     SerialCan::getInstance();
 }
 
 MainWindow::~MainWindow()
@@ -92,12 +92,19 @@ void MainWindow::writeData(const QByteArray &data)
 
 void MainWindow::sendFrame(const QCanBusFrame &frame) const {
     QString hexvalue = QString("%1").arg(frame.frameId(), 8, 16, QLatin1Char( '0' ));
-    QString data = "ID: " + hexvalue + " DATA: " + frame.payload().toHex();
+    QString data = "Send ID: " + hexvalue + " DATA: " + frame.payload().toHex();
+    m_ui->text_recv->append(data);
+}
+
+void MainWindow::recvFrame(const QCanBusFrame &frame) {
+    QString hexvalue = QString("%1").arg(frame.frameId(), 8, 16, QLatin1Char( '0' ));
+    QString data = "Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
     m_ui->text_recv->append(data);
 }
 
 void MainWindow::initActionsConnections()
 {
+    SerialCan& ptr = SerialCan::getInstance();
     connect(m_ui->actionConnect, &QAction::triggered, this, &MainWindow::openSerialPort);
     connect(m_ui->actionDisconnect, &QAction::triggered, this, &MainWindow::closeSerialPort);
     connect(m_ui->actionQuit, &QAction::triggered, this, &MainWindow::close);
@@ -106,6 +113,7 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 
     connect(m_ui->sendFrameBox, &SendFrameBox::sendFrame, this, &MainWindow::sendFrame);
+    connect(&ptr, &SerialCan::recvCanFrame, this, &MainWindow::recvFrame);
 }
 
 char MainWindow::makeCRC(const QByteArray &data)
@@ -140,7 +148,7 @@ void MainWindow::on_btn_send_clicked() {
     frame.GenerateWriteData(address, data);
     SerialCan::getInstance().writePacket(data);
 
-
+/*
     if (timerID == 0) {
         mDataArray.emplace_back(data);
         mDataArray.emplace_back(data);
@@ -154,5 +162,6 @@ void MainWindow::on_btn_send_clicked() {
         mDataArray.clear();
         SerialCan::getInstance().clearBuffer();
     }
+*/
     m_ui->text_recv->append(QString(data.toHex()).toUpper());
 }
