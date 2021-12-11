@@ -62,6 +62,9 @@ bool SerialCan::calPacket(QByteArray &data) {
 
         }
     } else {
+        if (data.size() >= 30) {
+            data.clear();
+        }
         return false;
     }
     return false;
