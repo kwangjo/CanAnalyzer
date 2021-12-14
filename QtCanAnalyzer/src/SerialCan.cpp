@@ -58,15 +58,17 @@ bool SerialCan::calPacket(QByteArray &data) {
                         data.remove(0, endPacket + 1);
                         return true;
                     }
+                } else {
+                    qDebug() << "remove Packet[1] dataSize" << data.size();
+                    data.clear();
                 }
             }
         } else {
-
-        }
-    } else {
-        if (data.size() >= 30) {
+            qDebug() << "remove !Packet[CanPacketType::CAN] dataSize" << data.size();
             data.clear();
         }
+    } else {
+        data.clear();
         return false;
     }
     return false;
