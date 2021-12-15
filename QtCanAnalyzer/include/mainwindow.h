@@ -82,6 +82,7 @@ private slots:
     void closeSerialPort();
     void about();
     void writeData(const QByteArray &data);
+    void clear();
 
     void sendFrame(const QCanBusFrame &frame) const;
 //    void recvFrame(const QCanBusFrame &frame);

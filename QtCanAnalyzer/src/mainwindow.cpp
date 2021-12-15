@@ -26,34 +26,31 @@ MainWindow::MainWindow(QWidget *parent) :
     m_status(new QLabel),
     m_settings(new SettingsDialog),
     mStatus(0),
-    timerID(0)
-{
+    timerID(0) {
     m_ui->setupUi(this);
-    QWidget::setWindowTitle("CanAnalyzer v0.1  ");
+    QWidget::setWindowTitle("CanAnalyzer Tool V0.1");
     m_ui->actionConnect->setEnabled(true);
     m_ui->actionDisconnect->setEnabled(false);
     m_ui->actionQuit->setEnabled(true);
     m_ui->actionConfigure->setEnabled(true);
+    m_ui->actionClear->setEnabled(true);
     m_ui->statusBar->addWidget(m_status);
 
     SerialCan::getInstance();
     initActionsConnections();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     SerialCan::destroyInstance();
     delete m_settings;
     delete m_ui;
 }
 
-void MainWindow::openSerialPort()
-{
+void MainWindow::openSerialPort() {
     const SettingsDialog::Settings p = m_settings->settings();
     QString name = p.name;
     qint32 baudRate = p.baudRate;
     if (SerialCan::getInstance().serialOpen(name, baudRate)){
-//    if (m_serial->open(QIODevice::ReadWrite)) {
         m_ui->actionConnect->setEnabled(false);
         m_ui->actionDisconnect->setEnabled(true);
         m_ui->actionConfigure->setEnabled(false);
@@ -65,8 +62,7 @@ void MainWindow::openSerialPort()
     }
 }
 
-void MainWindow::closeSerialPort()
-{
+void MainWindow::closeSerialPort() {
     SerialCan::getInstance().serialClose();
     m_ui->actionConnect->setEnabled(true);
     m_ui->actionDisconnect->setEnabled(false);
@@ -74,8 +70,7 @@ void MainWindow::closeSerialPort()
     showStatusMessage(tr("Disconnected"));
 }
 
-void MainWindow::about()
-{
+void MainWindow::about() {
     QMessageBox::about(this, tr("안녕하세요."),
                        tr("전자공작 까페에서 Can FD Analyzer 관련 개인취미생활을 진행하려고 만들게 되었습니다."
                           "반갑습니다. Qt 예제와 오픈소스를 참고로 진행 예정입니다."
@@ -84,10 +79,13 @@ void MainWindow::about()
                           ));
 }
 
-void MainWindow::writeData(const QByteArray &data)
-{
+void MainWindow::writeData(const QByteArray &data) {
     SerialCan::getInstance().writePacket(data);
-    //    m_serial->write(data);
+}
+
+void MainWindow::clear() {
+    m_ui->text_recv->clear();
+    SerialCan::getInstance().clearBuffer();
 }
 
 void MainWindow::sendFrame(const QCanBusFrame &frame) const {
@@ -98,10 +96,10 @@ void MainWindow::sendFrame(const QCanBusFrame &frame) const {
 
 void MainWindow::recvFrame(const qint8 &channel, const QCanBusFrame &frame) {
     QString hexvalue = QString("%1").arg(frame.frameId(), 8, 16, QLatin1Char( '0' ));
-    if (channel == CanPacketCMD::CAN_RECV_CAN0) {
+    if (channel == CanPacketCMD::CAN_RECV_CAN0 || channel == CanPacketCMD::CAN_SEND_CAN0) {
         QString data = "Channel: CAN0 Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
         m_ui->text_recv->append(data);
-    } else if (channel == CanPacketCMD::CAN_RECV_CAN1) {
+    } else if (channel == CanPacketCMD::CAN_RECV_CAN1 || channel == CanPacketCMD::CAN_SEND_CAN1) {
         QString data = "Channel: CAN1 Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
         m_ui->text_recv->append(data);
     }
@@ -113,8 +111,7 @@ void MainWindow::recvFrame(const qint8 &channel, const QCanBusFrame &frame) {
 //    m_ui->text_recv->append(data);
 //}
 
-void MainWindow::initActionsConnections()
-{
+void MainWindow::initActionsConnections() {
     SerialCan& ptr = SerialCan::getInstance();
     connect(m_ui->actionConnect, &QAction::triggered, this, &MainWindow::openSerialPort);
     connect(m_ui->actionDisconnect, &QAction::triggered, this, &MainWindow::closeSerialPort);
@@ -124,12 +121,12 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 
     connect(m_ui->sendFrameBox, &SendFrameBox::sendFrame, this, &MainWindow::sendFrame);
-//    connect(&ptr, &SerialCan::recvCanFrame, this, &MainWindow::recvFrame);
     connect(&ptr, &SerialCan::recvCanFrame, this, &MainWindow::recvFrame);
+
+    connect(m_ui->actionClear, &QAction::triggered, this, &MainWindow::clear);
 }
 
-char MainWindow::makeCRC(const QByteArray &data)
-{
+char MainWindow::makeCRC(const QByteArray &data) {
     char checkSum = 0;
     for (auto cData : data) {
         checkSum ^= cData;
@@ -145,8 +142,7 @@ void MainWindow::timerEvent(QTimerEvent *) {
     }
 }
 
-void MainWindow::showStatusMessage(const QString &message)
-{
+void MainWindow::showStatusMessage(const QString &message) {
     m_status->setText(message);
 }
 

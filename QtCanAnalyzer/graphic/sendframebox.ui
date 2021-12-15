@@ -187,10 +187,17 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string/>
-         </property>
+        <widget class="QComboBox" name="canDeviceBox">
+         <item>
+          <property name="text">
+           <string>can0</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>can1</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item>

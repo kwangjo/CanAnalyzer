@@ -8,7 +8,7 @@
 #include <QDebug>
 
 
-constexpr bool debug = true;
+constexpr bool debug = false;
 
 static std::unique_ptr<SerialCan> instance = nullptr;
 
@@ -23,9 +23,6 @@ SerialCan &SerialCan::getInstance() {
 SerialCan::SerialCan() {
     qDebug() << "2. Create SerialCan";
     getPortsInfo();
-//    QString portName = "COM4";
-//    qint32  baudRate = 115200;
-//    serialOpen(portName, baudRate);
 }
 
 // https://forum.kde.org/viewtopic.php?f=204&t=164584
@@ -49,26 +46,40 @@ bool SerialCan::calPacket(QByteArray &data) {
                         quint32 id = data.mid(BIT_ADDRESS_START, 4).toHex().toUInt(nullptr, 16);
                         QByteArray frameData = data.mid(BIT_ADDRESS_START + 4, dataLength - 4);
                         QCanBusFrame frame = QCanBusFrame(id, frameData);
-
-//                        qDebug() << "Hex ID" << data.mid(BIT_ADDRESS_START, 4).toHex();
-                        qDebug () << "frame is" << frame.frameId() << " data" << frame.payload();
-                        // change recvCanFrame channel
-//                        emit recvCanFrame(frame);
                         emit recvCanFrame(data[BIT_CMD] ,frame);
                         data.remove(0, endPacket + 1);
                         return true;
                     }
                 } else {
-                    qDebug() << "remove Packet[1] dataSize" << data.size();
-                    data.clear();
+                    qDebug() << "this packet is PC2";
+                    return false;
+                }
+            } else {
+                // This Pakcet is Only PC
+                // USB to Serial [TX<->RX]
+                qDebug() << "this packet is PC";
+                if (data[BIT_CMD] == static_cast<char>(CanPacketCMD::CAN_SEND_CAN0) ||
+                        data[BIT_CMD] == static_cast<char>(CanPacketCMD::CAN_SEND_CAN1)) {
+                    int16_t dataLength =  (data[BIT_LENGTH_MSB] << 8) | data[BIT_LENGTH_LSB];
+                    int endPacket = P_MIN_SIZE +static_cast<int>(dataLength) + 1; // + CRC + EOF (2)
+                    if (dataSize >= endPacket) {
+                        if (data[endPacket] == static_cast<char>(P_EOF)) {
+                            quint32 id = data.mid(BIT_ADDRESS_START, 4).toHex().toUInt(nullptr, 16);
+                            QByteArray frameData = data.mid(BIT_ADDRESS_START + 4, dataLength - 4);
+                            QCanBusFrame frame = QCanBusFrame(id, frameData);
+                            emit recvCanFrame(data[BIT_CMD] ,frame);
+                            data.remove(0, endPacket + 1);
+                            return true;
+                        }
+                    }
                 }
             }
         } else {
             qDebug() << "remove !Packet[CanPacketType::CAN] dataSize" << data.size();
-            data.clear();
+//            data.clear();
         }
     } else {
-        data.clear();
+//        data.clear();
         return false;
     }
     return false;
@@ -79,13 +90,14 @@ void SerialCan::readData() {
     QMutexLocker lock(&mMutex);
     const QByteArray data = readAll();
     mRecvData.append(data);
-    if (debug) qDebug() << "mRecvData : " << mRecvData.size() << "read Data" << data.size();
+    qDebug() << "mRecvData : " << mRecvData.size() << "read Data" << data.size();
     if (mRecvData.size() > P_MIN_SIZE) {
         while (calPacket(mRecvData)) {
             ++count;
         }
         if (debug) qDebug() << "recv Packet Data:" << count;
     }
+    qDebug() << "Current mRecvData Size : " << mRecvData.size();
 }
 
 void SerialCan::destroyInstance() {

@@ -233,21 +233,28 @@ SendFrameBox::SendFrameBox(QWidget *parent) :
 
 //        QByteArray data = QByteArray::fromHex(text.toLatin1()); // RawData
         QByteArray frameData = payload;
-        CanFrame canframe;
-        canframe.GenerateWriteData(frameId, frameData);
-        SerialCan::getInstance().writePacket(frameData);
-//        qDebug() << "send Data: " << frameData;
-//        qDebug() << "send Frame ID:" << frameId << " Data:" << payload;
-
         QCanBusFrame frame = QCanBusFrame(frameId, payload);
-//        frame.setExtendedFrameFormat(m_ui->extendedFormatBox->isChecked());
-//        frame.setFlexibleDataRateFormat(m_ui->flexibleDataRateBox->isChecked());
-//        frame.setBitrateSwitch(m_ui->bitrateSwitchBox->isChecked());
+        frame.setExtendedFrameFormat(m_ui->extendedFormatBox->isChecked());
+        frame.setFlexibleDataRateFormat(m_ui->flexibleDataRateBox->isChecked());
+        frame.setBitrateSwitch(m_ui->bitrateSwitchBox->isChecked());
 
-//        if (m_ui->errorFrame->isChecked())
-//            frame.setFrameType(QCanBusFrame::ErrorFrame);
-//        else if (m_ui->remoteFrame->isChecked())
-//            frame.setFrameType(QCanBusFrame::RemoteRequestFrame);
+        if (m_ui->errorFrame->isChecked())
+            frame.setFrameType(QCanBusFrame::ErrorFrame);
+        else if (m_ui->remoteFrame->isChecked())
+            frame.setFrameType(QCanBusFrame::RemoteRequestFrame);
+
+        int8_t canDeviceNumber = 0;
+        if (m_ui->canDeviceBox->currentText() == "can0") {
+            canDeviceNumber = 0;
+        } else if (m_ui->canDeviceBox->currentText() == "can1") {
+            canDeviceNumber = 1;
+        }
+        // Send to Serial Packet
+        CanFrame canframe;
+        canframe.GenerateWriteData(canDeviceNumber, frameId, frameData);
+//        canframe.GenerateWriteData(frameId, frameData); // fix to channel
+//        canframe.GenerateWriteData(canDeviceNumber, frame, frameData); // fix to channel
+        SerialCan::getInstance().writePacket(frameData);
 
         emit sendFrame(frame);
     });
