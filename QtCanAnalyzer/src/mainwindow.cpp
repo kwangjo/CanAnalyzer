@@ -96,11 +96,22 @@ void MainWindow::sendFrame(const QCanBusFrame &frame) const {
     m_ui->text_recv->append(data);
 }
 
-void MainWindow::recvFrame(const QCanBusFrame &frame) {
+void MainWindow::recvFrame(const qint8 &channel, const QCanBusFrame &frame) {
     QString hexvalue = QString("%1").arg(frame.frameId(), 8, 16, QLatin1Char( '0' ));
-    QString data = "Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
-    m_ui->text_recv->append(data);
+    if (channel == CanPacketCMD::CAN_RECV_CAN0) {
+        QString data = "Channel: CAN0 Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
+        m_ui->text_recv->append(data);
+    } else if (channel == CanPacketCMD::CAN_RECV_CAN1) {
+        QString data = "Channel: CAN1 Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
+        m_ui->text_recv->append(data);
+    }
 }
+
+//void MainWindow::recvFrame(const QCanBusFrame &frame) {
+//    QString hexvalue = QString("%1").arg(frame.frameId(), 8, 16, QLatin1Char( '0' ));
+//    QString data = "Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
+//    m_ui->text_recv->append(data);
+//}
 
 void MainWindow::initActionsConnections()
 {
@@ -113,6 +124,7 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 
     connect(m_ui->sendFrameBox, &SendFrameBox::sendFrame, this, &MainWindow::sendFrame);
+//    connect(&ptr, &SerialCan::recvCanFrame, this, &MainWindow::recvFrame);
     connect(&ptr, &SerialCan::recvCanFrame, this, &MainWindow::recvFrame);
 }
 

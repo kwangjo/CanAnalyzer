@@ -52,7 +52,9 @@ bool SerialCan::calPacket(QByteArray &data) {
 
 //                        qDebug() << "Hex ID" << data.mid(BIT_ADDRESS_START, 4).toHex();
                         qDebug () << "frame is" << frame.frameId() << " data" << frame.payload();
-                        emit recvCanFrame(frame);
+                        // change recvCanFrame channel
+//                        emit recvCanFrame(frame);
+                        emit recvCanFrame(data[BIT_CMD] ,frame);
                         data.remove(0, endPacket + 1);
                         return true;
                     }

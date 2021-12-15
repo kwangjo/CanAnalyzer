@@ -26,8 +26,8 @@ public:
 
     void clearBuffer();
 signals:
-    void recvCanFrame(QCanBusFrame frame);
-
+//    void recvCanFrame(QCanBusFrame frame);
+    void recvCanFrame(qint8 channel, QCanBusFrame frame);
 
 private:
     SerialCan();
