@@ -130,8 +130,8 @@ bool SerialCan::serialOpen(QString &name, qint32 &baudRate) {
     setParity(Parity::NoParity);
     setStopBits(StopBits::UnknownStopBits);
     if (open(QIODevice::ReadWrite)) {
-        setDataTerminalReady(true);  // true then the DTR signal is set to high
         setRequestToSend(true);      // true then the RTS signal is set to high
+        setDataTerminalReady(true);  // true then the DTR signal is set to high
         qDebug() << "connected";
         connect(this, &QIODevice::readyRead, this, &SerialCan::readData);
     } else {
