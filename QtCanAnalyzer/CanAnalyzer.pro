@@ -12,9 +12,11 @@ HEADERS += \
     include/settingsdialog.h \
     include/canframe.cpp \
     include/SerialCan.h \
-    include/sendframebox.h
+    include/sendframebox.h \
+    include/CanDeviceInfo.h
 
 SOURCES += \
+    src/CanDeviceInfo.cpp \
     src/SerialCan.cpp \
     src/main.cpp \
     src/mainwindow.cpp \

@@ -54,6 +54,7 @@
 
 #include <QDialog>
 #include <QSerialPort>
+#include <CanDeviceInfo.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -89,7 +90,8 @@ public:
     ~SettingsDialog();
 
     Settings settings() const;
-    QVariantMap loadJson();
+    void loadJson();
+    std::vector<CanDeviceInfo> getCanDeviceInfo();
 
 private slots:
     void showPortInfo(int idx);
@@ -107,6 +109,7 @@ private:
     Ui::SettingsDialog *m_ui = nullptr;
     Settings m_currentSettings;
     QIntValidator *m_intValidator = nullptr;
+    std::vector<CanDeviceInfo> mCanDeviceInfo;
 };
 
 #endif // SETTINGSDIALOG_H

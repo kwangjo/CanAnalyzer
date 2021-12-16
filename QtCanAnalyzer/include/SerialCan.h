@@ -9,6 +9,7 @@
 #include <QMutex>
 
 #include <QCanBusFrame>
+#include <CanDeviceInfo.h>
 
 class SerialCan : public QSerialPort {
     Q_OBJECT
@@ -25,6 +26,7 @@ public:
     qint64 writePacket(const QByteArray &data);
 
     void clearBuffer();
+    void canDeviceInit(CanDeviceInfo &device);
 signals:
 //    void recvCanFrame(QCanBusFrame frame);
     void recvCanFrame(qint8 channel, QCanBusFrame frame);
@@ -36,6 +38,7 @@ private:
 
     bool calPacket(QByteArray &data);
 
+    char makeCRC(const QByteArray &data);
 
 
 private slots:

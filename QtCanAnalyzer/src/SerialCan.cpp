@@ -85,6 +85,14 @@ bool SerialCan::calPacket(QByteArray &data) {
     return false;
 }
 
+char SerialCan::makeCRC(const QByteArray &data) {
+    char checkSum = 0;
+    for (auto cData : data) {
+        checkSum ^= cData;
+    }
+    return checkSum;
+}
+
 void SerialCan::readData() {
     int count = 0;
     QMutexLocker lock(&mMutex);
@@ -171,4 +179,18 @@ qint64 SerialCan::writePacket(const QByteArray &data) {
 
 void SerialCan::clearBuffer() {
     mRecvData.clear();
+}
+
+void SerialCan::canDeviceInit(CanDeviceInfo &device) {
+    QByteArray data;
+    data.append(P_SOF);
+    data.append(CanPacketType::COMMAND);       // TYPE
+    data.append(0x80);
+    data.append(0x05);  // LSB
+    data.append(static_cast<int8_t>(0x00));
+    data.append(device.getCanDevieData());
+    data.append(makeCRC(data));
+    data.append(P_EOF);
+
+    qDebug() << data.toHex();
 }

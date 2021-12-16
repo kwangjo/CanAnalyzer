@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mStatus(0),
     timerID(0) {
     m_ui->setupUi(this);
-    QWidget::setWindowTitle("CanAnalyzer Tool V0.1");
+    QWidget::setWindowTitle("CanAnalyzer Tool");
     m_ui->actionConnect->setEnabled(true);
     m_ui->actionDisconnect->setEnabled(false);
     m_ui->actionQuit->setEnabled(true);
@@ -57,6 +57,19 @@ void MainWindow::openSerialPort() {
         showStatusMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                           .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                           .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
+
+        // Add CAN Device init
+        auto canDevice = m_settings->getCanDeviceInfo();
+        for (auto data : canDevice) {
+            data.printInfo();
+            /*
+             *    | STX  | TYPE | CMD  | LSB |  MSB |  CAN(num)   | TYPE  | MODE  | BUAD | BUADDATA | CRC  | EOF
+             *    | 0xF0 | 0x02 | 0x80 | 0x5 |   0  |  0x01, 0x02 |
+             * N  |  0   |   1  |  2   |  3  |   4  |    5        |   6   |   7   |  8       9      |      |
+             */
+            SerialCan::getInstance().canDeviceInit(data);
+        }
+
     } else {
         showStatusMessage(tr("Open error"));
     }

@@ -312,7 +312,7 @@ void SettingsDialog::updateSettings()
     //    m_currentSettings.localEchoEnabled = m_ui->localEchoCheckBox->isChecked();
 }
 
-QVariantMap SettingsDialog::loadJson() {
+void SettingsDialog::loadJson() {
     qDebug() << "loadJson Complete";
     QFile jsonFile("Setting.json");
     QVariantMap map;
@@ -321,32 +321,50 @@ QVariantMap SettingsDialog::loadJson() {
         jsonFile.close();
         map = document.object().toVariantMap();
         QVariant value = map.value("Can1Mode");
+        mCanDeviceInfo.clear();
+        CanDeviceInfo can1, can2;
+        can1.setChannel(1);
+        can2.setChannel(2);
         m_ui->can1ModeBox->setCurrentIndex(value.toInt());
+        can1.setCanMode(value.toInt());
 
         value = map.value("Can1Frame");
         m_ui->can1FrameBox->setCurrentIndex(value.toInt());
+        can1.setFrameType(value.toInt());
 
         value = map.value("Can1Buad");
         m_ui->can1BuadBox->setCurrentIndex(value.toInt());
+        can1.setCanBuad(value.toInt());
 
         value = map.value("Can1BuadData");
         m_ui->can1BaudDataBox->setCurrentIndex(value.toInt());
+        can1.setCanBuadData(value.toInt());
 
         value = map.value("Can2Mode");
         m_ui->can2ModeBox->setCurrentIndex(value.toInt());
+        can2.setCanMode(value.toInt());
 
         value = map.value("Can2Frame");
         m_ui->can2FrameBox->setCurrentIndex(value.toInt());
+        can2.setFrameType(value.toInt());
 
         value = map.value("Can2Buad");
         m_ui->can2BuadBox->setCurrentIndex(value.toInt());
+        can2.setCanBuad(value.toInt());
 
         value = map.value("Can2BuadData");
         m_ui->can2BaudDataBox->setCurrentIndex(value.toInt());
+        can2.setCanBuadData(value.toInt());
 
         value = map.value("SerialPort");
         m_ui->serialPortInfoListBox->setCurrentText(value.toString());
         m_currentSettings.name = value.toString();
+
+        mCanDeviceInfo.emplace_back(can1);
+        mCanDeviceInfo.emplace_back(can2);
     }
-    return map;
+}
+
+std::vector<CanDeviceInfo> SettingsDialog::getCanDeviceInfo() {
+    return mCanDeviceInfo;
 }
