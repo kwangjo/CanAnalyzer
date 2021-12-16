@@ -190,12 +190,12 @@
         <widget class="QComboBox" name="canDeviceBox">
          <item>
           <property name="text">
-           <string>can0</string>
+           <string>can1</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>can1</string>
+           <string>can2</string>
           </property>
          </item>
         </widget>

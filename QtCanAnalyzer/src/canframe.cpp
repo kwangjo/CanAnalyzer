@@ -48,9 +48,9 @@ void CanFrame::GenerateWriteData(const int8_t &channel, const uint32_t &address,
     data.push_front(length & 0xFF);
 
     if (channel == 0) {
-        data.push_front(CanPacketCMD::CAN_SEND_CAN0);
-    } else if (channel == 1) {
         data.push_front(CanPacketCMD::CAN_SEND_CAN1);
+    } else if (channel == 1) {
+        data.push_front(CanPacketCMD::CAN_SEND_CAN2);
     }
     data.push_front(CanPacketType::CAN);
     data.push_front(P_SOF);

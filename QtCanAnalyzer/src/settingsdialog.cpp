@@ -51,10 +51,18 @@
 
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
+#include "commoncan.h"
 
 #include <QIntValidator>
 #include <QLineEdit>
 #include <QSerialPortInfo>
+
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QFile>
+
+#include <QDebug>
+
 
 static const char blankString[] = QT_TRANSLATE_NOOP("SettingsDialog", "N/A");
 
@@ -75,11 +83,13 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
             this, &SettingsDialog::checkCustomBaudRatePolicy);
     connect(m_ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &SettingsDialog::checkCustomDevicePathPolicy);
-
+    connect(m_ui->saveButton, &QPushButton::clicked,
+            this, &SettingsDialog::saveSetting);
     fillPortsParameters();
     fillPortsInfo();
 
     updateSettings();
+    loadJson();
 }
 
 SettingsDialog::~SettingsDialog()
@@ -131,6 +141,39 @@ void SettingsDialog::checkCustomDevicePathPolicy(int idx)
         m_ui->serialPortInfoListBox->clearEditText();
 }
 
+void SettingsDialog::saveSetting() {
+    QJsonObject json;
+    QJsonDocument document;
+
+    json.insert("Can1Mode" , m_ui->can1ModeBox->currentIndex());
+    json.insert("Can1Frame" , m_ui->can1FrameBox->currentIndex());
+    json.insert("Can1Buad" , m_ui->can1BuadBox->currentIndex());
+    json.insert("Can1BuadData" , m_ui->can1BaudDataBox->currentIndex());
+    json.insert("Can2Mode" , m_ui->can2ModeBox->currentIndex());
+    json.insert("Can2Frame" , m_ui->can2FrameBox->currentIndex());
+    json.insert("Can2Buad" , m_ui->can2BuadBox->currentIndex());
+    json.insert("Can2BuadData" , m_ui->can2BaudDataBox->currentIndex());
+    json.insert("SerialPort" , m_ui->serialPortInfoListBox->currentText());
+
+    if (0) {
+        qDebug () << "1 Mode" << m_ui->can1ModeBox->currentIndex() << " Frame : " << m_ui->can1FrameBox->currentIndex()
+                  << " Buad: " << m_ui->can1BuadBox->currentIndex() << " BuadData: " << m_ui->can1BaudDataBox->currentIndex();
+        qDebug () << "2 Mode" << m_ui->can2ModeBox->currentIndex() << " Frame : " << m_ui->can2FrameBox->currentIndex()
+                  << " Buad: " << m_ui->can2BuadBox->currentIndex() << " BuadData: " << m_ui->can2BaudDataBox->currentIndex();
+        qDebug() << "Json:" << json;
+    }
+
+    document.setObject(json);
+    QByteArray bytes = document.toJson(QJsonDocument::Indented);
+    QFile jsonFile("Setting.json");
+    if (jsonFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate )) {
+        QTextStream iStream( &jsonFile );
+        iStream.setCodec( "utf-8" );
+        iStream << bytes;
+        jsonFile.close();
+    }
+}
+
 void SettingsDialog::fillPortsParameters()
 {
     m_ui->baudRateBox->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
@@ -139,7 +182,7 @@ void SettingsDialog::fillPortsParameters()
     m_ui->baudRateBox->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
     m_ui->baudRateBox->addItem(QStringLiteral("115201"), 115201);
     m_ui->baudRateBox->addItem(tr("Custom"));
-    m_ui->baudRateBox->setCurrentIndex(4);
+    m_ui->baudRateBox->setCurrentIndex(3);
     m_ui->dataBitsBox->addItem(QStringLiteral("5"), QSerialPort::Data5);
     m_ui->dataBitsBox->addItem(QStringLiteral("6"), QSerialPort::Data6);
     m_ui->dataBitsBox->addItem(QStringLiteral("7"), QSerialPort::Data7);
@@ -161,6 +204,54 @@ void SettingsDialog::fillPortsParameters()
     m_ui->flowControlBox->addItem(tr("None"), QSerialPort::NoFlowControl);
     m_ui->flowControlBox->addItem(tr("RTS/CTS"), QSerialPort::HardwareControl);
     m_ui->flowControlBox->addItem(tr("XON/XOFF"), QSerialPort::SoftwareControl);
+
+    m_ui->can1FrameBox->addItem(tr("CLASSIC"), CANFrameType::CAN_CLASSIC);
+    m_ui->can1FrameBox->addItem(tr("FDNOBRS"), CANFrameType::CAN_FD_NO_BRS);
+    m_ui->can1FrameBox->addItem(tr("FDBRS"), CANFrameType::CAN_FD_BRS);
+    m_ui->can2FrameBox->addItem(tr("CLASSIC"), CANFrameType::CAN_CLASSIC);
+    m_ui->can2FrameBox->addItem(tr("FDNOBRS"), CANFrameType::CAN_FD_NO_BRS);
+    m_ui->can2FrameBox->addItem(tr("FDBRS"), CANFrameType::CAN_FD_BRS);
+
+    m_ui->can1ModeBox->addItem(tr("NORMAL"), CANMode::CAN_NORMAL);
+    m_ui->can1ModeBox->addItem(tr("MONITOR"), CANMode::CAN_NORMAL);
+    m_ui->can1ModeBox->addItem(tr("LOOPBACK"), CANMode::CAN_NORMAL);
+    m_ui->can2ModeBox->addItem(tr("NORMAL"), CANMode::CAN_NORMAL);
+    m_ui->can2ModeBox->addItem(tr("MONITOR"), CANMode::CAN_NORMAL);
+    m_ui->can2ModeBox->addItem(tr("LOOPBACK"), CANMode::CAN_NORMAL);
+
+    m_ui->can1BuadBox->addItem(tr("100K"), CanBitRate::CAN_100K);
+    m_ui->can1BuadBox->addItem(tr("125K"), CanBitRate::CAN_125K);
+    m_ui->can1BuadBox->addItem(tr("250K"), CanBitRate::CAN_250K);
+    m_ui->can1BuadBox->addItem(tr("500K"), CanBitRate::CAN_500K);
+    m_ui->can1BuadBox->addItem(tr("1M"), CanBitRate::CAN_1M);
+    m_ui->can1BuadBox->addItem(tr("2M"), CanBitRate::CAN_2M);
+    m_ui->can1BuadBox->addItem(tr("4M"), CanBitRate::CAN_4M);
+    m_ui->can1BuadBox->addItem(tr("5M"), CanBitRate::CAN_5M);
+    m_ui->can2BuadBox->addItem(tr("100K"), CanBitRate::CAN_100K);
+    m_ui->can2BuadBox->addItem(tr("125K"), CanBitRate::CAN_125K);
+    m_ui->can2BuadBox->addItem(tr("250K"), CanBitRate::CAN_250K);
+    m_ui->can2BuadBox->addItem(tr("500K"), CanBitRate::CAN_500K);
+    m_ui->can2BuadBox->addItem(tr("1M"), CanBitRate::CAN_1M);
+    m_ui->can2BuadBox->addItem(tr("2M"), CanBitRate::CAN_2M);
+    m_ui->can2BuadBox->addItem(tr("4M"), CanBitRate::CAN_4M);
+    m_ui->can2BuadBox->addItem(tr("5M"), CanBitRate::CAN_5M);
+
+    m_ui->can1BaudDataBox->addItem(tr("100K"), CanBitRate::CAN_100K);
+    m_ui->can1BaudDataBox->addItem(tr("125K"), CanBitRate::CAN_125K);
+    m_ui->can1BaudDataBox->addItem(tr("250K"), CanBitRate::CAN_250K);
+    m_ui->can1BaudDataBox->addItem(tr("500K"), CanBitRate::CAN_500K);
+    m_ui->can1BaudDataBox->addItem(tr("1M"), CanBitRate::CAN_1M);
+    m_ui->can1BaudDataBox->addItem(tr("2M"), CanBitRate::CAN_2M);
+    m_ui->can1BaudDataBox->addItem(tr("4M"), CanBitRate::CAN_4M);
+    m_ui->can1BaudDataBox->addItem(tr("5M"), CanBitRate::CAN_5M);
+    m_ui->can2BaudDataBox->addItem(tr("100K"), CanBitRate::CAN_100K);
+    m_ui->can2BaudDataBox->addItem(tr("125K"), CanBitRate::CAN_125K);
+    m_ui->can2BaudDataBox->addItem(tr("250K"), CanBitRate::CAN_250K);
+    m_ui->can2BaudDataBox->addItem(tr("500K"), CanBitRate::CAN_500K);
+    m_ui->can2BaudDataBox->addItem(tr("1M"), CanBitRate::CAN_1M);
+    m_ui->can2BaudDataBox->addItem(tr("2M"), CanBitRate::CAN_2M);
+    m_ui->can2BaudDataBox->addItem(tr("4M"), CanBitRate::CAN_4M);
+    m_ui->can2BaudDataBox->addItem(tr("5M"), CanBitRate::CAN_5M);
 }
 
 void SettingsDialog::fillPortsInfo()
@@ -218,5 +309,44 @@ void SettingsDialog::updateSettings()
                 m_ui->flowControlBox->itemData(m_ui->flowControlBox->currentIndex()).toInt());
     m_currentSettings.stringFlowControl = m_ui->flowControlBox->currentText();
 
-    m_currentSettings.localEchoEnabled = m_ui->localEchoCheckBox->isChecked();
+    //    m_currentSettings.localEchoEnabled = m_ui->localEchoCheckBox->isChecked();
+}
+
+QVariantMap SettingsDialog::loadJson() {
+    qDebug() << "loadJson Complete";
+    QFile jsonFile("Setting.json");
+    QVariantMap map;
+    if (jsonFile.open(QFile::ReadOnly)) {
+        QJsonDocument document = QJsonDocument().fromJson(jsonFile.readAll());
+        jsonFile.close();
+        map = document.object().toVariantMap();
+        QVariant value = map.value("Can1Mode");
+        m_ui->can1ModeBox->setCurrentIndex(value.toInt());
+
+        value = map.value("Can1Frame");
+        m_ui->can1FrameBox->setCurrentIndex(value.toInt());
+
+        value = map.value("Can1Buad");
+        m_ui->can1BuadBox->setCurrentIndex(value.toInt());
+
+        value = map.value("Can1BuadData");
+        m_ui->can1BaudDataBox->setCurrentIndex(value.toInt());
+
+        value = map.value("Can2Mode");
+        m_ui->can2ModeBox->setCurrentIndex(value.toInt());
+
+        value = map.value("Can2Frame");
+        m_ui->can2FrameBox->setCurrentIndex(value.toInt());
+
+        value = map.value("Can2Buad");
+        m_ui->can2BuadBox->setCurrentIndex(value.toInt());
+
+        value = map.value("Can2BuadData");
+        m_ui->can2BaudDataBox->setCurrentIndex(value.toInt());
+
+        value = map.value("SerialPort");
+        m_ui->serialPortInfoListBox->setCurrentText(value.toString());
+        m_currentSettings.name = value.toString();
+    }
+    return map;
 }

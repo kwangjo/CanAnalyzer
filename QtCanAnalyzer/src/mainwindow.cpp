@@ -96,11 +96,11 @@ void MainWindow::sendFrame(const QCanBusFrame &frame) const {
 
 void MainWindow::recvFrame(const qint8 &channel, const QCanBusFrame &frame) {
     QString hexvalue = QString("%1").arg(frame.frameId(), 8, 16, QLatin1Char( '0' ));
-    if (channel == CanPacketCMD::CAN_RECV_CAN0 || channel == CanPacketCMD::CAN_SEND_CAN0) {
-        QString data = "Channel: CAN0 Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
-        m_ui->text_recv->append(data);
-    } else if (channel == CanPacketCMD::CAN_RECV_CAN1 || channel == CanPacketCMD::CAN_SEND_CAN1) {
+    if (channel == CanPacketCMD::CAN_RECV_CAN1 || channel == CanPacketCMD::CAN_SEND_CAN1) {
         QString data = "Channel: CAN1 Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
+        m_ui->text_recv->append(data);
+    } else if (channel == CanPacketCMD::CAN_RECV_CAN2 || channel == CanPacketCMD::CAN_SEND_CAN2) {
+        QString data = "Channel: CAN2 Recv ID: " + hexvalue + " DATA: " + frame.payload().toHex();
         m_ui->text_recv->append(data);
     }
 }

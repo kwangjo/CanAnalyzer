@@ -89,12 +89,14 @@ public:
     ~SettingsDialog();
 
     Settings settings() const;
+    QVariantMap loadJson();
 
 private slots:
     void showPortInfo(int idx);
     void apply();
     void checkCustomBaudRatePolicy(int idx);
     void checkCustomDevicePathPolicy(int idx);
+    void saveSetting();
 
 private:
     void fillPortsParameters();

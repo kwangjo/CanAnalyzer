@@ -20,10 +20,10 @@ enum CanPacketType : char {
 };
 
 enum CanPacketCMD : char {
-    CAN_RECV_CAN0 = 0x00,
-    CAN_RECV_CAN1 = 0x01,
-    CAN_SEND_CAN0 = 0x02,
-    CAN_SEND_CAN1 = 0x03
+    CAN_RECV_CAN1 = 0x00,
+    CAN_RECV_CAN2 = 0x01,
+    CAN_SEND_CAN1 = 0x02,
+    CAN_SEND_CAN2 = 0x03
 };
 
 enum CanChannel : char {
@@ -46,11 +46,6 @@ enum CanCommand : char {
     CAN_RS232_BITRATE,     // Set RS232 Bitrate
 };
 
-enum CanBitRate : char {
-    CAN_100K = 0x00,
-
-};
-
 enum CanSerialBitRate : char {
     UART_9600 = 0x00,
     UART_19200,
@@ -59,6 +54,31 @@ enum CanSerialBitRate : char {
     UART_115200,
     UART_230400,
     UART_460800
+};
+
+// CAN
+
+enum CANFrameType : char {
+    CAN_CLASSIC = 0x00,
+    CAN_FD_NO_BRS,
+    CAN_FD_BRS
+};
+
+enum CANMode : char {
+    CAN_NORMAL = 0x00,
+    CAN_MONITOR,
+    CAN_LOOPBACK
+};
+
+enum CanBitRate : char {
+    CAN_100K = 0x00,
+    CAN_125K,
+    CAN_250K,
+    CAN_500K,
+    CAN_1M,
+    CAN_2M,
+    CAN_4M,
+    CAN_5M
 };
 
 #endif // COMMONCAN_H

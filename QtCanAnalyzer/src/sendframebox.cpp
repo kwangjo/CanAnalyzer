@@ -244,9 +244,9 @@ SendFrameBox::SendFrameBox(QWidget *parent) :
             frame.setFrameType(QCanBusFrame::RemoteRequestFrame);
 
         int8_t canDeviceNumber = 0;
-        if (m_ui->canDeviceBox->currentText() == "can0") {
+        if (m_ui->canDeviceBox->currentText() == "can1") {
             canDeviceNumber = 0;
-        } else if (m_ui->canDeviceBox->currentText() == "can1") {
+        } else if (m_ui->canDeviceBox->currentText() == "can2") {
             canDeviceNumber = 1;
         }
         // Send to Serial Packet
