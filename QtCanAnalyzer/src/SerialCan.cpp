@@ -32,8 +32,8 @@ bool SerialCan::calPacket(QByteArray &data) {
     // Serial RECV Check Data
     if (data[BIT_SOF] == static_cast<char>(P_SOF)) {
         if (data[BIT_TYPE] == static_cast<char>(CanPacketType::CAN)) {
-            if (data[BIT_CMD] == static_cast<char>(CanPacketCMD::CAN_RECV_CAN1) ||
-                    data[BIT_CMD] == static_cast<char>(CanPacketCMD::CAN_SEND_CAN2)) {
+            if (data[BIT_CMD] == static_cast<char>(CanPacketCMD::CAN_SEND_CAN1) ||
+                    data[BIT_CMD] == static_cast<char>(CanPacketCMD::CAN_RECV_CAN2)) {
                 int16_t dataLength =  (data[BIT_LENGTH_MSB] << 8) | data[BIT_LENGTH_LSB];
                 int endPacket = P_MIN_SIZE +static_cast<int>(dataLength) + 1; // + CRC + EOF (2)
                 if (dataSize >= endPacket) {

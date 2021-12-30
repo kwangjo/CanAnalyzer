@@ -20,10 +20,10 @@ enum CanPacketType : char {
 };
 
 enum CanPacketCMD : char {
-    CAN_RECV_CAN1 = 0x00,
-    CAN_RECV_CAN2 = 0x01,
-    CAN_SEND_CAN1 = 0x02,
-    CAN_SEND_CAN2 = 0x03
+    CAN_SEND_CAN1 = 0x00,
+    CAN_SEND_CAN2 = 0x01,
+    CAN_RECV_CAN1 = 0x02,
+    CAN_RECV_CAN2 = 0x03
 };
 
 enum CanChannel : char {
